@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        IMAGE_NAME = "het-devops-web"
+    }
+
     stages {
 
         stage('Checkout') {
@@ -11,7 +15,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t het-devops-web:v2 .'
+                sh 'docker build -t ${IMAGE_NAME}:${BUILD_NUMBER} .'
             }
         }
 
@@ -23,7 +27,7 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sh 'docker run -d --name het-devops-web -p 8085:80 het-devops-web:v2'
+                sh 'docker run -d --name het-devops-web -p 8085:80 ${IMAGE_NAME}:${BUILD_NUMBER}'
             }
         }
 
@@ -37,11 +41,11 @@ pipeline {
 
     post {
         success {
-            echo '🚀 CI/CD Deployment Successful!'
+            echo "🚀 Deployment Successful - Image: ${IMAGE_NAME}:${BUILD_NUMBER}"
         }
 
         failure {
-            echo '❌ CI/CD Pipeline Failed!'
+            echo '❌ Deployment Failed!'
         }
     }
 }
